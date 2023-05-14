@@ -14,7 +14,8 @@ class PostController extends Controller
      */
     public function index()
     {
-       return view("post.index"); 
+       $posts = Post::paginate(5);
+       return view("post.index", compact('posts')); 
     }
 
     /**
@@ -43,7 +44,7 @@ class PostController extends Controller
             'title' => $request->title,
             'content' => $request->content
         ]); 
-        return redirect("/posts");
+        return redirect("/posts")->with('successAlert','Successfully created');
     }
 
     /**
@@ -65,7 +66,8 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        return "i'm edit $id";
+        $post = Post::find($id);
+        return view('post.edit', compact('post'));
     }
 
     /**
@@ -77,7 +79,16 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'content' => 'required'
+        ]); 
+
+       Post::find($id)->update([
+        'title' => $request->title,
+        'content' => $request->content 
+       ]); 
+       return redirect('/posts')->with('successAlert','Successfully updated');
     }
 
     /**
@@ -88,6 +99,7 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+       Post::find($id)->delete(); 
+       return redirect('/posts')->with('successAlert','You have successfully deleted');
     }
 }
